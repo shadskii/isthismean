@@ -45,6 +45,7 @@ import {
   computed,
   defineComponent,
   inject,
+  onMounted,
   ref,
   watch,
 } from '@nuxtjs/composition-api'
@@ -92,18 +93,24 @@ export default defineComponent({
     const message = ref('')
     const sentiment = ref<Prediction[]>([])
 
+    const modelRef = ref<null | toxicity.ToxicityClassifier>(null)
+    const threshold = 0.8
+    onMounted(() => {
+      toxicity.load(threshold, []).then((model) => {
+        modelRef.value = model
+      })
+    })
+
     watch(
       message,
       debounce((messageText) => {
-        const threshold = 0.8
-
-        toxicity.load(threshold).then((model) => {
-          const sentences = [messageText]
-
-          model.classify(sentences).then((predictions: unknown) => {
-            sentiment.value = predictions as Prediction[]
-          })
-        })
+        if (modelRef.value) {
+          modelRef.value
+            .classify([messageText])
+            .then((predictions: unknown) => {
+              sentiment.value = predictions as Prediction[]
+            })
+        }
       }, 200)
     )
 
