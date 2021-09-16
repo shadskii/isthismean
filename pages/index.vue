@@ -8,9 +8,12 @@
       flex-dir="column"
       justify-content="center"
     >
-      <CHeading text-align="center" mb="4">
-        ⚡️ Hello chakra-ui/vue
-      </CHeading>
+      <CHeading text-align="center" mb="4" class="emoji">{{ emoji }}</CHeading>
+      <CFlex justify="center" direction="column" align="center">
+        <CBadge v-for="badge in badges" :key="badge">
+          {{ badge }}
+        </CBadge>
+      </CFlex>
       <CFlex justify="center" direction="column" align="center">
         <CBox mb="3">
           <CIconButton
@@ -21,148 +24,119 @@
             } mode`"
             @click="toggleColorMode"
           />
-          <CButton
-            left-icon="info"
-            variant-color="blue"
-            @click="showToast"
-          >
-            Show Toast
-          </CButton>
+
+          <CTextarea v-model="message"> </CTextarea>
         </CBox>
-        <CAvatarGroup>
-          <CAvatar
-            name="Evan You"
-            alt="Evan You"
-            src="https://pbs.twimg.com/profile_images/1206997998900850688/cTXTQiHm_400x400.jpg"
-          >
-            <CAvatarBadge size="1.0em" bg="green.500" />
-          </CAvatar>
-          <CAvatar
-            name="Jonathan Bakebwa"
-            alt="Jonathan Bakebwa"
-            src="https://res.cloudinary.com/xtellar/image/upload/v1572857445/me_zqos4e.jpg"
-          >
-            <CAvatarBadge size="1.0em" bg="green.500" />
-          </CAvatar>
-          <CAvatar
-            name="Segun Adebayo"
-            alt="Segun Adebayo"
-            src="https://pbs.twimg.com/profile_images/1169353373012897802/skPUWd6e_400x400.jpg"
-          >
-            <CAvatarBadge size="1.0em" bg="green.500" />
-          </CAvatar>
-          <CAvatar src="pop">
-            <CAvatarBadge size="1.0em" border-color="papayawhip" bg="tomato" />
-          </CAvatar>
-        </CAvatarGroup>
-        <CButton
-          left-icon="close"
-          variant-color="red"
-          mt="3"
-          @click="showModal = true"
-        >
-          Delete Account
-        </CButton>
-        <CModal :is-open="showModal">
-          <CModalOverlay />
-          <CModalContent>
-            <CModalHeader>Are you sure?</CModalHeader>
-            <CModalBody>Deleting user cannot be undone</CModalBody>
-            <CModalFooter>
-              <CButton @click="showModal = false">
-                Cancel
-              </CButton>
-              <CButton
-                margin-left="3"
-                variant-color="red"
-                @click="showModal = false"
-              >
-                Delete User
-              </CButton>
-            </CModalFooter>
-            <CModalCloseButton @click="showModal = false" />
-          </CModalContent>
-        </CModal>
       </CFlex>
     </CBox>
   </div>
 </template>
 
-<script lang="js">
+<script lang="ts">
 import {
   CBox,
-  CButton,
-  CAvatarGroup,
-  CAvatar,
-  CAvatarBadge,
-  CModal,
-  CModalContent,
-  CModalOverlay,
-  CModalHeader,
-  CModalFooter,
-  CModalBody,
-  CModalCloseButton,
+  CTextarea,
+  CBadge,
   CIconButton,
   CFlex,
-  CHeading
+  CHeading,
 } from '@chakra-ui/vue'
+import {
+  computed,
+  defineComponent,
+  inject,
+  ref,
+  watch,
+} from '@nuxtjs/composition-api'
+import * as tfjs from '@tensorflow/tfjs'
+import * as toxicity from '@tensorflow-models/toxicity'
+import debounce from 'lodash/debounce'
 
-export default {
+type Prediction = {
+  label: string
+  results: {
+    probabilities: Float32Array
+    match: boolean
+  }[]
+}
+
+export default defineComponent({
   name: 'App',
   components: {
+    CTextarea,
+    CBadge,
     CBox,
-    CButton,
-    CAvatarGroup,
-    CAvatar,
-    CAvatarBadge,
-    CModal,
-    CModalContent,
-    CModalOverlay,
-    CModalHeader,
-    CModalFooter,
-    CModalBody,
-    CModalCloseButton,
     CIconButton,
     CFlex,
-    CHeading
+    CHeading,
   },
-  inject: ['$chakraColorMode', '$toggleColorMode'],
-  data () {
-    return {
-      showModal: false,
-      mainStyles: {
-        dark: {
-          bg: 'gray.700',
-          color: 'whiteAlpha.900'
-        },
-        light: {
-          bg: 'white',
-          color: 'gray.900'
-        }
+  setup() {
+    const chakraColorMode = inject('$chakraColorMode') as () => string
+    const toggleColorMode = inject('$toggleColorMode')
+    const colorMode = computed(() => {
+      return chakraColorMode()
+    })
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const backend = tfjs.getBackend()
+    const mainStyles = ref({
+      dark: {
+        bg: 'gray.700',
+        color: 'whiteAlpha.900',
+      },
+      light: {
+        bg: 'white',
+        color: 'gray.900',
+      },
+    })
+
+    const message = ref('')
+    const sentiment = ref<Prediction[]>([])
+
+    watch(
+      message,
+      debounce((messageText) => {
+        const threshold = 0.8
+
+        toxicity.load(threshold).then((model) => {
+          const sentences = [messageText]
+
+          model.classify(sentences).then((predictions: unknown) => {
+            sentiment.value = predictions as Prediction[]
+          })
+        })
+      }, 200)
+    )
+
+    const badges = computed(() => {
+      return sentiment.value
+        .filter((sentiment) => {
+          return sentiment.results[0].match !== false
+        })
+        .map((sentiment) => {
+          return sentiment.label
+        })
+    })
+
+    const emoji = computed(() => {
+      if (badges.value.length === 0) {
+        return '🙂'
       }
+      return '😡'
+    })
+    return {
+      message,
+      mainStyles,
+      emoji,
+      colorMode,
+      sentiment,
+      toggleColorMode,
+      badges,
     }
   },
-  computed: {
-    colorMode () {
-      return this.$chakraColorMode()
-    },
-    theme () {
-      return this.$chakraTheme()
-    },
-    toggleColorMode () {
-      return this.$toggleColorMode
-    }
-  },
-  methods: {
-    showToast () {
-      this.$toast({
-        title: 'Account created.',
-        description: "We've created your account for you.",
-        status: 'success',
-        duration: 10000,
-        isClosable: true
-      })
-    }
-  }
-}
+})
 </script>
+<style scoped>
+.emoji {
+  font-size: 10em;
+}
+</style>
