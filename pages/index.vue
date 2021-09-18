@@ -37,7 +37,7 @@
           <CText font-size="sm" mb="4">
             Write me a message and I'll tell you if I think it's mean.
           </CText>
-          <CTextarea v-model="message" h="200px"> </CTextarea>
+          <CTextarea v-model="message" h="50px"> </CTextarea>
         </CBox>
       </CFlex>
     </CBox>
