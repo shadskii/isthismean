@@ -1,31 +1,43 @@
 <template>
   <div class="container">
-    <CBox
-      v-bind="mainStyles[colorMode]"
-      d="flex"
-      w="100vw"
-      h="100vh"
-      flex-dir="column"
-      justify-content="center"
-    >
-      <CHeading text-align="center" mb="4" class="emoji">{{ emoji }}</CHeading>
-      <CFlex justify="center" direction="column" align="center">
-        <CBadge v-for="badge in badges" :key="badge">
+    <CBox v-bind="mainStyles[colorMode]" w="100vw" h="100vh">
+      <CFlex
+        justify="space-between"
+        direction="row"
+        align="center"
+        px="3"
+        pt="3"
+      >
+        <CHeading> Is this mean? </CHeading>
+        <CIconButton
+          :icon="colorMode === 'light' ? 'moon' : 'sun'"
+          :aria-label="`Switch to ${
+            colorMode === 'light' ? 'dark' : 'light'
+          } mode`"
+          @click="toggleColorMode"
+        />
+      </CFlex>
+
+      <CHeading text-align="center" class="emoji">{{ emoji }}</CHeading>
+      <CFlex justify="center" direction="row" align="center" h="50px">
+        <CBadge v-for="badge in badges" :key="badge" mx="1">
           {{ badge }}
         </CBadge>
       </CFlex>
       <CFlex justify="center" direction="column" align="center">
-        <CBox mb="3">
-          <CIconButton
-            mr="3"
-            :icon="colorMode === 'light' ? 'moon' : 'sun'"
-            :aria-label="`Switch to ${
-              colorMode === 'light' ? 'dark' : 'light'
-            } mode`"
-            @click="toggleColorMode"
-          />
-
-          <CTextarea v-model="message"> </CTextarea>
+        <CBox
+          mb="3"
+          :width="[
+            '80%', // base
+            '50%', // 480px upwards
+            '25%', // 768px upwards
+            '15%', // 992px upwards
+          ]"
+        >
+          <CText font-size="sm" mb="4">
+            Write me a message and I'll tell you if I think it's mean.
+          </CText>
+          <CTextarea v-model="message" h="200px"> </CTextarea>
         </CBox>
       </CFlex>
     </CBox>
@@ -39,27 +51,13 @@ import {
   CBadge,
   CIconButton,
   CFlex,
+  CText,
   CHeading,
 } from '@chakra-ui/vue'
-import {
-  computed,
-  defineComponent,
-  inject,
-  onMounted,
-  ref,
-  watch,
-} from '@nuxtjs/composition-api'
-import * as tfjs from '@tensorflow/tfjs'
-import * as toxicity from '@tensorflow-models/toxicity'
-import debounce from 'lodash/debounce'
+import { computed, defineComponent, inject, ref } from '@nuxtjs/composition-api'
+import '@tensorflow/tfjs-backend-webgl'
 
-type Prediction = {
-  label: string
-  results: {
-    probabilities: Float32Array
-    match: boolean
-  }[]
-}
+import { useIsTextMean } from '~/models'
 
 export default defineComponent({
   name: 'App',
@@ -70,6 +68,7 @@ export default defineComponent({
     CIconButton,
     CFlex,
     CHeading,
+    CText,
   },
   setup() {
     const chakraColorMode = inject('$chakraColorMode') as () => string
@@ -77,8 +76,6 @@ export default defineComponent({
     const colorMode = computed(() => {
       return chakraColorMode()
     })
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const backend = tfjs.getBackend()
     const mainStyles = ref({
       dark: {
         bg: 'gray.700',
@@ -90,29 +87,7 @@ export default defineComponent({
       },
     })
 
-    const message = ref('')
-    const sentiment = ref<Prediction[]>([])
-
-    const modelRef = ref<null | toxicity.ToxicityClassifier>(null)
-    const threshold = 0.8
-    onMounted(() => {
-      toxicity.load(threshold, []).then((model) => {
-        modelRef.value = model
-      })
-    })
-
-    watch(
-      message,
-      debounce((messageText) => {
-        if (modelRef.value) {
-          modelRef.value
-            .classify([messageText])
-            .then((predictions: unknown) => {
-              sentiment.value = predictions as Prediction[]
-            })
-        }
-      }, 200)
-    )
+    const { message, sentiment, isProcessing } = useIsTextMean()
 
     const badges = computed(() => {
       return sentiment.value
@@ -125,6 +100,9 @@ export default defineComponent({
     })
 
     const emoji = computed(() => {
+      if (isProcessing.value) {
+        return '🤔'
+      }
       if (badges.value.length === 0) {
         return '🙂'
       }
@@ -144,6 +122,6 @@ export default defineComponent({
 </script>
 <style scoped>
 .emoji {
-  font-size: 10em;
+  font-size: 12em;
 }
 </style>

@@ -1,7 +1,7 @@
 export default {
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
-
+  ssr: false,
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'isthismean',
@@ -54,6 +54,12 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    vendor: ['@tensorflow/tfjs',"@tensorflow/tfjs-core"],
+    vendor: ['@tensorflow/tfjs',"@tensorflow/tfjs-core","@tensorflow/tfjs-backend-webgl"],
+    extend(config) {
+      config.module.rules.push({
+        test: /\.worker\.js$/,
+        use: { loader: "worker-loader" }
+      });
+    }
   }
 }
