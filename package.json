@@ -2,6 +2,9 @@
   "name": "isthismean",
   "version": "1.0.0",
   "private": true,
+  "workspaces":[
+    "nuxt-3"
+  ],
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",
