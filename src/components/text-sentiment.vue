@@ -1,13 +1,6 @@
-<template>
-  <div class="container">
-    <h2 class="emoji">🙂</h2>
-    <textarea v-model="message" rows="5" cols="33" />
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import { debounce } from 'lodash'
+import { computed, ref, watch } from "vue";
+import { debounce, startCase } from 'lodash'
 import SentimentWorker from '../sentiment-worker.ts?worker'
 
 type Prediction = {
@@ -38,16 +31,82 @@ watch(
   }, 500)
 )
 
+const badges = computed(() => {
+  return sentiment.value
+    .filter((sentiment) => {
+      return sentiment.results[0].match !== false
+    })
+    .map((sentiment) => {
+      return startCase(sentiment.label.replaceAll('_', ' '))
+    })
+})
+
+const emoji = computed(() => {
+  if (isProcessing.value) {
+    return '🤔'
+  }
+  if (badges.value.length === 0) {
+    return '🙂'
+  }
+  return '😡'
+})
+
 </script>
 
-<style scoped>
+<template>
+  <div>
+    <h1>Is this mean?</h1>
+    <div class="container">
+      <h2 class="emoji">{{ emoji }}</h2>
+      <div class="badge-container">
+        <span v-for="badge in badges" :key="badge" class="badge">{{ badge }}</span>
+      </div>
+      <p>Write me a message and I'll tell you if I think it's mean.</p>
+      <textarea v-model="message" rows="5" cols="33" />
+    </div>
+  </div>
+</template>
+
+<style>
 .container {
   display: flex;
   flex-direction: column;
+  text-align: center;
 }
 .emoji {
   font-size: 10rem;
   margin: 0;
   text-align: center;
+}
+.badge-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+.badge-container .badge {
+  margin: 0 0.5rem;
+  padding: 0 0.5rem;
+  border-radius: 0.25rem;
+  background-color: #e2e8f029;
+}
+textarea {
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  transition: all 0.2s ease 0s;
+  outline: none;
+  appearance: none;
+  font-size: 1rem;
+  padding: 8px 1rem;
+  line-height: 1.25;
+  border-radius: 0.25rem;
+  border-width: 1px;
+  border-color: rgba(255, 255, 255, 0.04);
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--font-color);
+  font-family: inherit;
+}
+textarea:focus {
+  border-color: white;
 }
 </style>
