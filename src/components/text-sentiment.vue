@@ -16,17 +16,20 @@ const sentimentWorker = new SentimentWorker();
 const message = ref('');
 const sentiment = ref<Prediction[]>([])
 
-const isProcessing = ref(false);
+const requests = ref(0);
+const isProcessing = computed(() => {
+  return requests.value > 0;
+});
 
 sentimentWorker.onmessage = (e) => {
   sentiment.value = e.data;
-  isProcessing.value = false;
+  requests.value -= 1;
 }
 
 watch(
   message,
   debounce((messageText) => {
-    isProcessing.value = true;
+    requests.value += 1;
     sentimentWorker.postMessage(messageText);
   }, 500)
 )
