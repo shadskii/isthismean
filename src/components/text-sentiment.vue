@@ -78,18 +78,18 @@ const emoji = computed(() => {
 }
 .badge-container {
   display: flex;
-  justify-content: center;
   flex-direction: row;
+  flex-wrap: wrap;
   margin: 0.5rem 0;
-  height: 1.5rem;
+  min-height: 1.5rem;
 }
 .badge-container .badge {
   display: inline-block;
   height: 1.25rem;
-  margin: 0 0.5rem;
+  margin: 0.25rem 0.5rem;
   padding: 0 0.5rem;
   border-radius: 0.25rem;
-  background-color: #e2e8f029;
+  background-color: #c70f2b73;
 }
 .text-input {
   flex: 1;
