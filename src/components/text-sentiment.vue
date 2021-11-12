@@ -86,8 +86,12 @@ const emoji = computed(() => {
   display: flex;
   justify-content: center;
   flex-direction: row;
+  margin: 0.5rem 0;
+  height: 1.5rem;
 }
 .badge-container .badge {
+  display: inline-block;
+  height: 1.25rem;
   margin: 0 0.5rem;
   padding: 0 0.5rem;
   border-radius: 0.25rem;
