@@ -61,8 +61,8 @@ const emoji = computed(() => {
       <div class="badge-container">
         <span v-for="badge in badges" :key="badge" class="badge">{{ badge }}</span>
       </div>
+      <textarea class="text-input" v-model="message" rows="5" />
       <p>Write me a message and I'll tell you if I think it's mean.</p>
-      <textarea v-model="message" rows="5" cols="33" />
     </div>
   </div>
 </template>
@@ -72,6 +72,10 @@ const emoji = computed(() => {
   display: flex;
   flex-direction: column;
   text-align: center;
+  align-items: center;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 .emoji {
   font-size: 10rem;
@@ -89,9 +93,9 @@ const emoji = computed(() => {
   border-radius: 0.25rem;
   background-color: #e2e8f029;
 }
-textarea {
+.text-input {
+  flex: 1;
   display: flex;
-  -webkit-box-align: center;
   align-items: center;
   transition: all 0.2s ease 0s;
   outline: none;
@@ -105,8 +109,9 @@ textarea {
   background-color: rgba(255, 255, 255, 0.06);
   color: var(--font-color);
   font-family: inherit;
+  width: 100%;
 }
-textarea:focus {
+.text-input:focus {
   border-color: white;
 }
 </style>
