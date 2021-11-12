@@ -78,7 +78,7 @@ const emoji = computed(() => {
   padding: 0 1rem;
 }
 .emoji {
-  font-size: 10rem;
+  font-size: 8rem;
   margin: 0;
   text-align: center;
 }
