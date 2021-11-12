@@ -2,19 +2,13 @@
 import { computed, ref, watch } from "vue";
 import { debounce, startCase } from 'lodash'
 import SentimentWorker from '../sentiment-worker.ts?worker'
+import { Prediction } from "../sentiment-worker";
 
-type Prediction = {
-  label: string
-  results: {
-    probabilities: Float32Array
-    match: boolean
-  }[]
-}
 
 const sentimentWorker = new SentimentWorker();
 
 const message = ref('');
-const sentiment = ref<Prediction[]>([])
+const sentiment = ref<Prediction>([])
 
 const requests = ref(0);
 const isProcessing = computed(() => {
