@@ -51,16 +51,13 @@ const emoji = computed(() => {
 </script>
 
 <template>
-  <div>
-    <h1>Is this mean?</h1>
-    <div class="container">
-      <h2 class="emoji">{{ emoji }}</h2>
-      <div class="badge-container">
-        <span v-for="badge in badges" :key="badge" class="badge">{{ badge }}</span>
-      </div>
-      <textarea class="text-input" v-model="message" rows="5" />
-      <p>Write me a message and I'll tell you if I think it's mean.</p>
+  <div class="container">
+    <h2 class="emoji">{{ emoji }}</h2>
+    <div class="badge-container">
+      <span v-for="badge in badges" :key="badge" class="badge">{{ badge }}</span>
     </div>
+    <textarea class="text-input" v-model="message" rows="5" />
+    <p>Write me a message and I'll tell you if I think it's mean.</p>
   </div>
 </template>
 

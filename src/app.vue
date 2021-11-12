@@ -4,7 +4,12 @@ import TextSentiment from './components/text-sentiment.vue';
 </script>
 
 <template>
-  <TextSentiment />
+  <div>
+    <h1>Is this mean?</h1>
+    <main>
+      <TextSentiment />
+    </main>
+  </div>
 </template>
 
 <style>
