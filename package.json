@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
-    "serve": "vite preview"
+    "build": "vue-tsc --noEmit --skipLibCheck && vite build",
+    "serve": "vite preview --port 8080"
   },
   "dependencies": {
     "@tensorflow-models/toxicity": "^1.2.2",
