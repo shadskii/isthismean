@@ -64,13 +64,14 @@ const toxics = ref([
       <span v-for="badge in badges" :key="badge" class="badge">{{ badge }}</span>
     </div>
     <textarea class="text-input" v-model="message" rows="5" />
-    <p>Write me a message and I'll tell you if I think it's mean.</p>
+    <p>Write me a message and I'll tell you if it's mean.</p>
     <div>
-      <p>This site uses machine learing to detect toxic text. It can detect if text contains toxic content such as:</p>
+      <p>Use machine learning to detect toxict text. This site can detect if text contains toxic content such as:</p>
       <div class="badge-container">
         <span v-for="badge in toxics" :key="badge" class="badge">{{ badge }}</span>
       </div>
-      <details>
+
+      <details class="tech-details">
         <summary>Technical Details</summary>
         <h3>ML Model</h3>
         <p>
@@ -149,5 +150,11 @@ const toxics = ref([
 }
 .text-input:focus {
   border-color: white;
+}
+.tech-details summary:hover {
+  cursor: pointer;
+}
+.tech-details {
+  margin: 2rem 0;
 }
 </style>
