@@ -27,4 +27,12 @@ import TextSentiment from './components/text-sentiment.vue';
 html {
   background: var(--bg-color);
 }
+
+a {
+  color: var(--font-color);
+}
+code {
+  background-color: #4a5568;
+  padding: 1px;
+}
 </style>

@@ -48,8 +48,15 @@ const emoji = computed(() => {
   return '😡'
 })
 
-</script>
+const toxics = ref([
+  "threatening language",
+  'insults',
+  'obscenities',
+  'identity-based hate',
+  'sexually explicit'
+])
 
+</script>
 <template>
   <div class="container">
     <h2 class="emoji">{{ emoji }}</h2>
@@ -58,6 +65,37 @@ const emoji = computed(() => {
     </div>
     <textarea class="text-input" v-model="message" rows="5" />
     <p>Write me a message and I'll tell you if I think it's mean.</p>
+    <div>
+      <p>This site uses machine learing to detect toxic text. It can detect if text contains toxic content such as:</p>
+      <div class="badge-container">
+        <span v-for="badge in toxics" :key="badge" class="badge">{{ badge }}</span>
+      </div>
+      <details>
+        <summary>Technical Details</summary>
+        <h3>ML Model</h3>
+        <p>
+          Under the hood this site uses a pretrained Tensorflow text toxicity model. This model was trained on the
+          <a
+            href="https://figshare.com/articles/data_json/7376747"
+          >civil comments dataset</a>, a collection of ~2 million comments labeled for toxicity. The comments are user-generated online news comments published from 2015-2017 as part of a now-defunct commenting platform.
+        </p>
+        <h3>Web Dev Technicals</h3>
+        <p>
+          This site uses tensorflow.js and it's WebGL backend to perform ML inferences in the browser. This model is published on npm as
+          <code>@tensorflow-models/toxicity</code>.
+        </p>
+        <p>In order to keep the UI responsive, inferences are performed off the main thread on a background thread using the Web Workers API.</p>
+
+        <h3>Dev Stack</h3>
+        <p>isthismean is written in typescript using vue.js 3 and bundled with vite.js. The site is hosted on netlify.</p>
+        <p>
+          Learn more about this project by viewing the source code on
+          <a
+            href="https://github.com/shadskii/isthismean"
+          >Github</a>.
+        </p>
+      </details>
+    </div>
   </div>
 </template>
 
@@ -65,7 +103,7 @@ const emoji = computed(() => {
 .container {
   display: flex;
   flex-direction: column;
-  text-align: center;
+  text-align: start;
   align-items: center;
   max-width: 40rem;
   margin: 0 auto;
