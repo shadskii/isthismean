@@ -1,6 +1,8 @@
 # Is this mean?
 
-[isthismean.com](https://isthismean.com/) uses a Tensorflow.js ML model to detect text toxicity using client side js. A user can submit their own text to be analyzed for toxicity.
+[![Netlify Status](https://api.netlify.com/api/v1/badges/da1abe6b-59d3-4e69-9c7a-b792a4a40815/deploy-status)](https://app.netlify.com/sites/isthismean/deploys)
+
+[isthismean.com](https://isthismean.com/) is a fun proof of concept site that uses a Tensorflow.js ML model to detect text toxicity using client side js. A user can submit their own text to be analyzed for toxicity.
 
 ## Reference Links
 
